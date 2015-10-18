@@ -1,0 +1,35 @@
+1-1.html
+<script type="text/javascript" src="jquery-1.9.0.min.js"></script>
+<script>
+$(document).ready(function(){
+    var obj = $("#A");
+    obj.on('dragleave', function (e)
+    {
+        e.stopPropagation();
+        e.preventDefault();
+        console.log("dragleave");
+        $(this).css('background', '#F00');
+    });
+    obj.on('dragover', function (e)
+    {
+         e.stopPropagation();
+         e.preventDefault();
+         console.log("dragover");
+         $(this).css('background', '#00F');
+    });
+    obj.on('drop', function (e)
+    {
+        e.preventDefault();
+         $(this).css('background', '#0F0');
+
+         var files = e.originalEvent.dataTransfer.files;
+         console.log("drop");
+         console.log(files);
+         //We need to send dropped files to Server
+
+    });
+});
+</script>
+<div id='A' style='width:500px;height:500px;background:#F00'>
+asdasd
+</div>

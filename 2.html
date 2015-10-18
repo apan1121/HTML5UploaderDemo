@@ -1,0 +1,330 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=BIG5">
+<title>Insert title here</title>
+</head>
+<script type="text/javascript" src="/javascript/jquery/jquery.js"></script>
+<script type="text/javascript" src="binaryajax.js"></script>
+<script type="text/javascript" src="exif.js"></script>
+<script type="text/javascript" src="canvasResize.js"></script>
+
+<script type="text/javascript" src="DropHtml5Upload.js"></script>
+<link href="DropHtml5Upload.css" rel="stylesheet" type="text/css" />
+
+<script>
+var option={resize:{"b":1024,"n":460,"m":200,"s":50},
+            process_info:true,
+            multiple:false,
+            ajax_data:{lib:100,pageid:100},
+            lang:{selectBTShowName:"選擇檔案",submitBTShowName:"上傳"},
+            //select_bt:"adsa",
+            //submit_bt:"<div>adsa</div>",
+            ajax_success:function(return_data){
+                //code
+                DropHtml5Upload.input_process_data("ajax succes callback:\r\n"+return_data);
+                },
+            ajax_finish:function(){
+                //code
+                alert("finish");
+                }
+
+            };
+
+$(document).ready(function(){
+    DropHtml5Upload = new DropHtml5Upload("#droparea",option);
+});
+</script>
+<body>
+DropHtml5Upload.js , single
+<div id="droparea">
+**this is original text in droparea box**
+</div>
+
+<div id="test">
+</div>
+<script>
+$(document).ready(function(){
+   $("#test").append("<input type='file' id='test_file'>");
+   $("#test_file").change(function(){
+        alert(1);
+   });
+});
+</script>
+
+
+<br><br><br><br>
+<div class="code" style='width:800px;padding:5px;border:1px solid #999;background:#DDD;'>
+<pre>
+    option= {
+           resize: {"file":1024},
+           preview_size:100,
+           drop_info:'&lt;p class="dropfiletext"&gt;Drop files here&lt;/p&gt;&lt;p&gt;or&lt;/p&gt;',
+
+           select_bt:'&lt;input type="button" value="Select Files" in_option/&gt;',
+           submit_bt:'&lt;input type="button" value="upload" in_option/&gt;',
+
+           loading_info:'&lt;img src="/images/loader_128x15.gif"&gt;',
+           filter : /image/i,
+           ajax_type:'POST',
+           ajax_url:'upload.php',
+           ajax_data:{},
+           ajax_success:{},
+           ajax_finish:{},
+           delay:1000,
+           lang:{   "selectBTShowName":'select file',
+                    "submitBTShowName":'upload',
+                    "file_not_supported":'*{file_name}:Selected file format not supported!',
+                    "create_preview": '{file_name}:create preview',
+                    "upload_success": '{file_name}:upload success',
+                    "upload_finsih": 'upload finsih.',
+                    "not_multiple": 'only can upload one file.',
+                    "init_error":"init error",
+                    "support_input_file_error":"input file can't support",
+                    "support_html5_canvas_error":"html5 canvas can't support",
+                    "support_html5_filereader_api_error":"html5 FileReader API can't support",
+                    "options_preview_set_error": 'preview size is not number',
+                    "options_resize_error_no": 'please set option->resize',
+                    "options_resize_set_error": 'resize \'{resizeKey}\' is not number'},
+           multiple :true,
+           process_info:true
+         };
+
+    $(document).ready(function(){
+        DropHtml5Upload = new DropHtml5Upload("#droparea",option);
+    });
+</pre>
+</div>
+<br><br><br>
+<style>
+.des_tb{
+    width:800px;
+    background:#DDD;
+    margin:5px;
+    border:1px solid #000;
+}
+.des_title{
+    text-align:right;
+    width:80px;
+    padding:5px;
+    background:#FFC;
+}
+.code_name{
+    font-weight:900;
+    background:#FF0;
+}
+.des_info{
+    text-align:left;
+    padding:5px;
+    background:#FCF;
+}
+</style>
+<div class='description' style='padding:10px;'>
+    <table class='des_tb'>
+        <tr>
+            <td class='des_title code_name'>resize</td><td class='des_info'>set you need size and data name</td>
+        </tr>
+        <tr>
+            <td class='des_title example'>exsample</td><td class='des_info'>resize:{"b":1024,"n":460,"m":200,"s":50}</td>
+        </tr>
+    </table>
+    <table class='des_tb'>
+        <tr>
+            <td class='des_title code_name'>preview_size</td><td class='des_info'>preview pic size, need is number.</td>
+        </tr>
+        <tr>
+            <td class='des_title example'>example</td><td class='des_info'>preview_size:100</td>
+        </tr>
+    </table>
+
+    <table class='des_tb'>
+        <tr>
+            <td class='des_title code_name'>drop_info</td><td class='des_info'>drop area show text</td>
+        </tr>
+    </table>
+    <table class='des_tb'>
+        <tr>
+            <td class='des_title code_name'>select_bt</td><td class='des_info'>select pic button.</td>
+        </tr>
+        <tr>
+            <td class='des_title example'>example</td><td class='des_info'>select_bt:'&lt;input type="button" value="Select Files" in_option/&gt;'<br>
+        or<br>
+        select_bt:'&lt;div class='select_bt' &gt; select &lt;/div&gt;'</td>
+        </tr>
+    </table>
+    <table class='des_tb'>
+        <tr>
+            <td class='des_title code_name'>submit_bt</td><td class='des_info'>select pic button.</td>
+        </tr>
+        <tr>
+            <td class='des_title example'>example</td><td class='des_info'>submit_bt:'&lt;input type="button" value="Upload to server" in_option/&gt;'<br>
+        or<br>
+        submit_bt:'&lt;div class='select_bt' &gt; Upload to server &lt;/div&gt;'</td>
+        </tr>
+    </table>
+    <table class='des_tb'>
+        <tr>
+            <td class='des_title code_name'>loading_info</td><td class='des_info'>when process,show Loading UI.</td>
+        </tr>
+        <tr>
+            <td class='des_title example'>example</td><td class='des_info'>loading_info:'&lt;img src="/images/loader_128x15.gif"&gt;'</td>
+        </tr>
+    </table>
+    <table class='des_tb'>
+        <tr>
+            <td class='des_title code_name'>filter</td><td class='des_info'>need upload file type.</td>
+        </tr>
+        <tr>
+            <td class='des_title example'>example</td><td class='des_info'>filter : /image/i</td>
+        </tr>
+    </table>
+    <table class='des_tb'>
+        <tr>
+            <td class='des_title code_name'>ajax_type</td><td class='des_info'>upload to server method.</td>
+        </tr>
+        <tr>
+            <td class='des_title example'>example</td><td class='des_info'>ajax_type:'POST'</td>
+        </tr>
+    </table>
+    <table class='des_tb'>
+        <tr>
+            <td class='des_title code_name'>ajax_url</td><td class='des_info'>server url.</td>
+        </tr>
+        <tr>
+            <td class='des_title example'>example</td><td class='des_info'>ajax_url:'upload.php'</td>
+        </tr>
+    </table>
+    <table class='des_tb'>
+        <tr>
+            <td class='des_title code_name'>ajax_data</td><td class='des_info'>Extended input data to server.</td>
+        </tr>
+        <tr>
+            <td class='des_title example'>example</td><td class='des_info'>
+            ajax_data:{lib:100,pageid:100}</td>
+        </tr>
+    </table>
+    <table class='des_tb'>
+        <tr>
+            <td class='des_title code_name'>ajax_success</td><td class='des_info'>when one file upload finish callback.</td>
+        </tr>
+        <tr>
+            <td class='des_title example'>example</td><td class='des_info'>
+            <pre>ajax_success:function(server_return_data){
+    alert(server_return_data);
+}
+            </pre>
+            </td>
+        </tr>
+    </table>
+    <table class='des_tb'>
+        <tr>
+            <td class='des_title code_name'>ajax_finish</td><td class='des_info'> when all files upload finish callback.</td>
+        </tr>
+        <tr>
+            <td class='des_title example'>example</td><td class='des_info'>
+            <pre>ajax_finish:function(){
+    alert("finish");
+}
+            </pre>
+            </td>
+        </tr>
+    </table>
+    <table class='des_tb'>
+        <tr>
+            <td class='des_title code_name'>delay</td><td class='des_info'>set time out delay time, need number.</td>
+        </tr>
+    </table>
+    <table class='des_tb'>
+        <tr>
+            <td class='des_title code_name'>lang</td><td class='des_info'>custom process info laguage or button show name.</td>
+        </tr>
+        <tr>
+            <td class='des_title example'>example</td><td class='des_info'>
+            <pre>
+lang:{selectBTShowName:"選擇檔案",
+      init_error:"初始化錯誤"}
+            </pre>
+            </td>
+        </tr>
+    </table>
+    <table class='des_tb'>
+        <tr>
+            <td class='des_title code_name'>multiple</td><td class='des_info'>single file or multiple files.</td>
+        </tr>
+        <tr>
+            <td class='des_title example'>example</td><td class='des_info'>multiple:true</td>
+        </tr>
+    </table>
+    <table class='des_tb'>
+        <tr>
+            <td class='des_title code_name'>process_info</td><td class='des_info'>show process info.</td>
+        </tr>
+        <tr>
+            <td class='des_title example'>example</td><td class='des_info'>process_info:true</td>
+        </tr>
+    </table>
+
+
+    <pre style='display:none;'>
+resize : set you need size and data name
+exsample: resize:{"b":1024,"n":460,"m":200,"s":50}
+
+preview_size: preview pic size, need is number.
+example: preview_size:100
+
+drop_info: drop area show text
+
+select_bt: select pic button.
+example:select_bt:'&lt;input type="button" value="Select Files" in_option/&gt;'
+        or
+        select_bt:'&lt;div class='select_bt' &gt; select &lt;/div&gt;'
+
+submit_bt: select pic button.
+example:submit_bt:'&lt;input type="button" value="Upload to server" in_option/&gt;'
+        or
+        submit_bt:'&lt;div class='select_bt' &gt; Upload to server &lt;/div&gt;'
+
+loading_info:when process,show Loading UI.
+example:loading_info:'&lt;img src="/images/loader_128x15.gif"&gt;'
+
+filter:need upload file type.
+example:filter : /image/i
+
+ajax_type: upload to server method.
+example: ajax_type:'POST'
+
+ajax_url: server url.
+example: ajax_url:'upload.php'
+
+ajax_data: Extended input data to server.
+example:ajax_data:{lib:100,pageid:100}
+
+ajax_success: when one file upload finish callback.
+example:ajax_success:function(server_return_data){
+                          alert(server_return_data);
+                     }
+
+ajax_finish:  when all files upload finish callback.
+example:ajax_finish:function(){
+                          alert("finish");
+                    }
+
+delay:set time out delay time, need number.
+
+lang:custom process info laguage or button show name.
+example:lang:{selectBTShowName:"選擇檔案",
+              init_error:"初始化錯誤"}
+
+multiple:single file or multiple files.
+example:multiple:true
+
+process_info:show process info.
+example:process_info:true
+
+    </pre>
+</div>
+
+
+
+</body>
+</html>

@@ -1,0 +1,390 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=BIG5">
+<title>Insert title here</title>
+</head>
+<script type="text/javascript" src="/javascript/jquery/jquery.js"></script>
+<script type="text/javascript" src="binaryajax.js"></script>
+<script type="text/javascript" src="exif.js"></script>
+<script type="text/javascript" src="canvasResize.js"></script>
+<style>
+#droparea{
+    position:relative;
+    width: 700px;
+    min-height:200px;
+    border: 7px dashed #ccc;
+    border-radius: 10px;
+    vertical-align: baseline;
+    margin: 0 auto;
+    text-align: center;
+    text-shadow: 1px 1px 0 #fff;
+}
+#droparea.hover{
+    border-color:#777;
+    background-color:#fff;
+}
+#droparea_loading{
+    position: absolute;
+    top:0px;
+    left:0px;
+    height: 100%;
+    background: #999;
+    width: 100%;
+    filter:alpha(opacity=50);
+    -moz-opacity:0.5;
+    opacity: 0.5;
+    display:none;
+    color:#000;
+    font-size:15px;
+    font-weight:900;
+}
+.tpl{
+    display:none;
+}
+.imageholder{
+    margin:3px;
+    display:inline-block;
+    width:120px;
+    text-align:center;
+    position:relative;
+    border:1px solid #999;
+    cursor:pointer;
+}
+.imageholder .del{
+    position:absolute;
+    right:0px;
+    top:0px;
+    cursor:pointer;
+    display:none;
+}
+.imageholder .image{
+    text-align:center;
+    width:120px;
+    height:120px;
+    display:table-cell;
+    vertical-align:middle;
+}
+
+.imageholder .filename{
+    text-align:center;
+    width:100%;
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+}
+#preview{
+    padding:5px;
+    display:none;
+}
+</style>
+<script>
+var tpl_imageholder='    <div class="imageholder" key="{$key}"> \
+    <div class="image">\
+<img src="{$filePath}" alt="{$fileName}"/>\
+</div>\
+<div class="filename">{$fileName}</div>\
+<img class="del" src="/images/icon_fail_22.png">\
+</div>';
+
+var key =0;
+var uploadData={};
+
+var resize={"b":1024,"n":460,"m":200,"s":50}
+
+$(document).ready(function() {
+    var prevMaxLength=100,
+        imgWidth = 180,
+        imgHeight = 180,
+        zindex = 0;
+    dropzone = $('#droparea'),
+    uploadBtn = $('#uploadbtn'),
+    defaultUploadBtn = $('#upload');
+    preview = $('#preview');
+
+    $("#preview").delegate(".imageholder","click",function(){
+        index = $(".imageholder").index($(this));
+        $(".imageholder .del").not( $(".imageholder .del:eq("+index+")") ).fadeOut()
+        $(this).find(".del").fadeIn();
+        $(this).find(".del").unbind('click').bind('click',function(){
+            var del_key=$(this).parent().attr("key");
+            $(".imageholder[key='"+del_key+"']").remove();
+            uploadData[del_key]=null;
+
+            checkDropareaType();
+        });
+    });
+
+    dropzone.bind('dragover', function() {
+        //add hover class when drag over
+        dropzone.addClass('hover');
+        return false;
+    });
+
+    dropzone.bind('dragleave', function() {
+        //remove hover class when drag out
+        dropzone.removeClass('hover');
+        return false;
+    });
+
+    dropzone.bind('drop', function(e) {
+        //prevent browser from open the file when drop off
+        e.stopPropagation();
+        e.preventDefault();
+        dropzone.removeClass('hover');
+
+        //retrieve uploaded files data
+        var files = e.originalEvent.dataTransfer.files;
+        processFiles(files);
+
+        return false;
+    });
+
+    uploadBtn.bind('click', function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        //trigger default file upload button
+        checkProcessShow();
+        defaultUploadBtn.click();
+        $(window).bind('focus',Listener);
+        window.addEventListener('touchend',Listener,false);
+    });
+
+    var Listener=function(){
+        if(defaultUploadBtn.val()==""){
+            checkProcessHide(processFlag);
+        }
+        $(window).unbind('focus');
+        window.removeEventListener('touchend', Listener, false);
+    }
+
+    defaultUploadBtn.bind('change', function() {
+        //retrieve selected uploaded files data
+        var files = $(this)[0].files;
+        processFiles(files);
+        return false;
+
+    });
+
+    /*****************************
+        Process FileList
+    *****************************/
+    var processFlag={count:0,flag:{}};
+    var processFiles = function(files) {
+        checkProcessShow();
+        processFlag={count:0,flag:{}};
+        setTimeout(function(){
+            if(files && typeof FileReader !== "undefined") {
+                //process each files only if browser is supported
+                processFlag.count = files.length;
+                for(var i=0; i<files.length; i++) {
+                    processFlag.flag[i]=false;
+                    readFile(files,i);
+                    uploadData[key]=files[i];
+                }
+
+                $("#preview").show();
+                $(".dropareainner").hide();
+            } else {
+                checkProcessHide(processFlag);
+            }
+        },1000);
+
+    }
+
+    /*****************************
+        Read the File Object
+    *****************************/
+    var readFile = function(files,processkey) {
+        var file = files[processkey];
+        if( (/image/i).test(file.type) ) {
+            key=key+1;
+            createPreview(file,key,processkey);
+
+            $('#err').text('');
+        } else {
+            //some message for wrong file format
+            processFlag.flag[processkey]=true;
+            $('#err').text('*Selected file format not supported!');
+        }
+    }
+
+    /*****************************
+        Draw Image Preview
+    *****************************/
+    var createPreview = function(file,key,processkey) {
+        canvasResize(file, {
+            width: prevMaxLength,
+            height: prevMaxLength,
+            crop: false,
+            quality: 100,
+            rotate: 0,
+            callback: function(data, width, height) {
+                var imageObj = {};
+                imageObj.filePath = data;
+                imageObj.fileName = file.name.substr(0, file.name.lastIndexOf('.')); //subtract file extension
+                var tpl=tpl_imageholder;
+                tpl = tpl.replace(/\{\$key\}/gi,key);
+                tpl = tpl.replace(/\{\$filePath\}/gi,imageObj.filePath);
+                tpl = tpl.replace(/\{\$fileName\}/gi,imageObj.fileName);
+                preview.prepend(tpl);
+                $(".imageholder[key='"+key+"'] .image img").load(function(){
+                    processFlag.flag[processkey]=true;
+                    checkProcessHide(processFlag);
+                });
+            }
+        });
+    };
+
+
+    $("#now_upload").click(function(){
+        for(var key in uploadData){
+            upload_data(key);
+        }
+    });
+});
+
+function checkProcessShow(){
+    $("#droparea_loading").show();
+}
+
+function checkProcessHide(processFlag){
+    var count = processFlag.count;
+    var flag = true;
+    if(count>0){
+        for(var i=0; i<count; i++) {
+            if(!processFlag.flag[i]){
+                flag=false;
+                break;
+            }
+        }
+    }
+    if(flag){
+        $("#droparea_loading").hide();
+    }
+}
+
+function checkDropareaType(){
+    if($(".imageholder").length<=0){
+        $(".dropareainner").show();
+        $("#preview").hide();
+    }else{
+        $(".dropareainner").hide();
+        $("#preview").show();
+    }
+}
+
+function upload_data(key){
+    file = uploadData[key];
+    if(file != null){
+        var uploadFile={};
+        for(var resize_key in resize){
+            uploadResize(uploadFile,resize_key,key);
+        }
+
+    }
+
+
+}
+
+function uploadResize(uploadFile,resize_key,key){
+    file = uploadData[key];
+
+    canvasResize(file, {
+        width: resize[resize_key],
+        height: resize[resize_key],
+        crop: false,
+        quality: 100,
+        rotate: 0,
+        callback: function(data, width, height) {
+            uploadFile[resize_key]=data;
+            upload_ajax(uploadFile,key);
+            }
+    });
+}
+
+function upload_ajax(uploadFile,key){
+    var uploadflag=true;
+
+    for(var resize_key in resize){
+        if(typeof(uploadFile[resize_key])=="undefined"){
+            uploadflag=false;
+            break;
+        }
+    }
+    if(uploadflag){
+        var fd = new FormData();
+        var file = uploadData[key];
+        var fileName = file.name;
+        fd.append("filename", fileName);
+
+        for(var resize_name in resize){
+            uploadFile[resize_name] = canvasResize('dataURLtoBlob', uploadFile[resize_name]);
+            uploadFile[resize_name].name = fileName;
+            fd.append(resize_name, uploadFile[resize_name]);
+        }
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'upload.php', true);
+        xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+        xhr.setRequestHeader("pragma", "no-cache");
+        //Upload progress
+        xhr.upload.addEventListener("progress", function(e) {
+            if (e.lengthComputable) {
+                var loaded = Math.ceil((e.loaded / e.total) * 100);
+                console.log("load:"+loaded);
+                $('#area p span').css({
+                    'width': loaded + "%"
+                }).html(loaded + "%");
+            }
+        }, false);
+
+        // File uploaded
+        xhr.addEventListener("load", function(e) {
+            responseText  = e.target.responseText;
+            $(".imageholder[key='"+key+"']").fadeOut(function(){
+                $(this).remove();
+                checkDropareaType();
+            });
+            uploadData[key]=null;
+
+            $("#upload_info").append(responseText);
+        }, false);
+        // Send data
+        xhr.send(fd);
+
+    }
+}
+</script>
+<body id='body'>
+
+
+<div id="droparea">
+
+    <div id="preview">
+    </div>
+    <div class="dropareainner">
+        <p class="dropfiletext">Drop files here</p>
+        <p>or</p>
+        <p><input id="uploadbtn" class="uploadbtn" type="button" value="Select Files"/></p>
+        <input id="upload" type="file" style="display:none"  accept="image/*" capture="camera" multiple/>
+        //
+    </div>
+    <div id="droparea_loading">
+        <table width='100%' height='100%'>
+            <tr>
+                <td align='center'>loading...</td>
+            </tr>
+        </table>
+
+    </div>
+</div>
+<div style='text-align:center;'>
+    <input type='button' id="now_upload" value='upload'>
+</div>
+
+<p id="err">Wait there! You must ENABLE Javascript to have this works!</p>
+<textarea id="upload_info" style='width:500px;height:100px;'>
+</textarea>
+</body>
+</html>

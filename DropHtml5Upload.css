@@ -1,0 +1,119 @@
+
+.DropHtml5Upload{
+    position:relative;
+    width: 700px;
+    min-height:200px;
+    border: 7px dashed #ccc;
+    border-radius: 10px;
+    vertical-align: baseline;
+    margin: 0 auto;
+    text-align: center;
+    text-shadow: 1px 1px 0 #fff;
+
+    -moz-user-select: none;  /* for Firefox */
+    -webkit-user-select: none;  /* for Chrome */
+
+}
+
+.DropHtml5Upload.hover{
+    border-color:#777;
+    background-color:#fff;
+}
+
+.DropHtml5Upload .preview{
+    padding:5px;
+    display:none;
+}
+
+.DropHtml5Upload  .submit_file{
+    text-align:center;
+    display:none;
+}
+
+.DropHtml5Upload .droparea_loading{
+    position: absolute;
+    top:0px;
+    left:0px;
+    height: 100%;
+    background: #999;
+    width: 100%;
+    filter:alpha(opacity=50);
+    -moz-opacity:0.5;
+    opacity: 0.5;
+    display:none;
+    color:#000;
+    font-size:15px;
+    font-weight:900;
+}
+
+
+.DropHtml5Upload .imageholder{
+    margin:3px;
+    display:inline-block;
+    width:120px;
+    text-align:center;
+    position:relative;
+    border:1px solid #DDD;
+    cursor:pointer;
+}
+
+.DropHtml5Upload .imageholder.hover{
+    border:1px solid #333;
+}
+
+.DropHtml5Upload .imageholder.focus{
+    border:1px solid #933;
+}
+
+.DropHtml5Upload .imageholder .image{
+    text-align:center;
+    width:120px;
+    height:120px;
+    display:table-cell;
+    vertical-align:middle;
+}
+
+.DropHtml5Upload .imageholder .filename{
+    text-align:center;
+    width:100%;
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+}
+
+.DropHtml5Upload .imageholder .del{
+    position:absolute;
+    right:0px;
+    top:0px;
+    cursor:pointer;
+    width:22px;
+    height:22px;
+    background-image:url('/images/icon_fail_22.png');
+    display:none;
+}
+
+.DropHtml5Upload  .process{
+    position:absolute;
+    bottom:10px;
+    left:0px;
+    width:100px;
+    margin:0px 10px;
+}
+.DropHtml5Upload  .process .bar{
+    width:0%;
+    background:#00F;
+    height:5px;
+}
+
+.DropHtml5Upload  .process_info_div{
+
+}
+.DropHtml5Upload  .process_info_div .process_info_data{
+    width:98%;
+    height:200px;
+    max-width:98%;
+    margin:0 auto;
+    border:1px solid #DDD;
+    -moz-user-select: text;  /* for Firefox */
+    -webkit-user-select: text;  /* for Chrome */
+}
